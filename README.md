@@ -1,108 +1,122 @@
-# Simple NGINX Forward Proxy as Docker Container
+# 🚀 NGINX Forward Proxy для обхода блокировок
 
-This is a simple [NGINX](https://www.nginx.com/) Forward Proxy Docker Image that you can use to bypass content filters, access geo-restricted websites, and protect your privacy online.
+Безопасный и производительный прокси-сервер на базе NGINX с поддержкой HTTP CONNECT туннелей для обхода блокировок и доступа к заблокированному контенту, включая YouTube.
 
-NGINX does not support forward proxying by default, but this Docker Image uses a custom NGINX module called [ngx_http_proxy_connect_module](https://github.com/chobits/ngx_http_proxy_connect_module) to enable this functionality. The module adds support for the `HTTP CONNECT` method, which is used to establish a tunnel through the proxy to the destination server.
+## ✨ Особенности
 
-Furthermore, the image has been optimized for performance and security based on the suggestions provided by [UnixTeacher.org](https://www.unixteacher.org/blog/build-options-to-improve-the-performance-and-security-of-nginx/).
+- 🔒 **Безопасность**: Rate limiting, connection limits, блокировка опасных путей
+- ⚡ **Производительность**: Оптимизированная конфигурация NGINX с лучшими практиками
+- 🌐 **Совместимость**: Поддержка HTTP и HTTPS через CONNECT туннели
+- 🛡️ **Защита**: Блокировка доступа к внутренним сервисам и потенциально опасным ресурсам
+- 📊 **Мониторинг**: Подробное логирование и health check endpoint
 
-To get started, simply run the container on your local machine or server to get started. The NGINX configuration can be easily customized to meet your specific needs, and the container can be deployed on any platform that supports Docker containers.
+## 🚢 Быстрый запуск на Railway
 
-For questions or issues, feel free to open an issue in this repository.
-
-| Component | Version  |
-|-----------|----------|
-| alpine    | 3.21     |
-| nginx     | 1.27.1   |
-| zlib      | 1.3.1    |
-
-## How to Run
-
-To start the container, you can use one of the following methods:
-
-Using Docker Compose:
-```bash
-docker-compose up -d
-```
-
-Using Docker:
-
-```bash
-docker run --rm -d -p 8080:8080 --name nginx-forward-proxy dominikbechstein/nginx-forward-proxy
-# -d: Run the container in detached mode
-# -p: Map port 8080 on the host to port 8080 in the container
-# --name: Assign a name to the container
-```
-
-Using a Custom `nginx.conf`:
-```bash
-docker run --rm -d -p 8080:8080 --name nginx-forward-proxy \
-  -v ${PWD}/nginx.conf:/usr/local/nginx/conf/nginx.conf \
-  dominikbechstein/nginx-forward-proxy
-```
-
-This allows you to override the default NGINX configuration with your custom settings.
-
-
-## Useful Snippets
-
-Get your local IP address.
-```bash
-ifconfig | grep broadcast | cut -d' ' -f2
-```
-
-# Client Configuration
-
-Suppose you run the container on your local machine with IP address: `192.168.2.192`.
-
-# curl
-
-```bash
-curl -x http://192.168.2.192:8080 -ik --proxy-insecure https://www.google.de/
-```
-
-# iOS
-Wi-Fi settings -> your Wi-Fi -> at the bottom Configure Proxy -> Manual -> set server and port -> don't forget to save
-
-
-<img src="https://raw.githubusercontent.com/dominikwinter/nginx-forward-proxy/master/assets/nginx-forward-proxy-client-configuration-1.jpg" width="140" height="303" /> <img src="https://raw.githubusercontent.com/dominikwinter/nginx-forward-proxy/master/assets/nginx-forward-proxy-client-configuration-2.jpg" width="140" height="303" /> <img src="https://raw.githubusercontent.com/dominikwinter/nginx-forward-proxy/master/assets/nginx-forward-proxy-client-configuration-3.jpg" width="140" height="303" /> <img src="https://raw.githubusercontent.com/dominikwinter/nginx-forward-proxy/master/assets/nginx-forward-proxy-client-configuration-4.jpg" width="140" height="303" /> <img src="https://raw.githubusercontent.com/dominikwinter/nginx-forward-proxy/master/assets/nginx-forward-proxy-client-configuration-5.jpg" width="140" height="303" />
-
-## Security Note
-
-Running a forward proxy can expose your network to potential security risks if not configured properly. Ensure that the proxy is not accessible from the public internet without proper authentication. Consider using firewall rules, VPNs, or other access control mechanisms to restrict access to trusted clients only.
-
-## Developer Guide
-
-### Building the Docker Container
-
-To build the Docker container locally, follow these steps:
-
-1. Ensure you have Docker installed on your system. You can verify this by running:
+1. **Деплой проекта**:
    ```bash
-   docker --version
+   git add .
+   git commit -m "Add NGINX forward proxy for bypassing blocks"
+   git push railway main
    ```
 
-2. Navigate to the project directory:
-   ```bash
-   cd /path/to/nginx-forward-proxy
-   ```
+2. **Настройка переменных окружения в Railway**:
+   - `PORT`: `8080` (порт Railway)
+   - `PROXY_AUTH_ENABLED`: `false` (для публичного доступа)
+   - `ALLOWED_IPS`: `0.0.0.0/0` (разрешить все IP)
+   - `RATE_LIMIT`: `1000` (запросов в секунду)
+   - `TIMEOUT`: `30s`
 
-3. Build the Docker image using the `docker build` command:
-   ```bash
-   docker build -t nginx-forward-proxy .
+## 📱 Использование прокси
 
-   # -t nginx-forward-proxy: Tags the image with the name nginx-forward-proxy
-   # .: Specifies the current directory as the build context
-   ```
+### Получение URL сервиса
+После деплоя в Railway получите ваш домен (например: `your-proxy.railway.app`)
 
-4. Verify that the image has been built successfully:
-   ```bash
-   docker images | grep nginx-forward-proxy
-   ```
+### Настройка в браузере
 
-You can now use this locally built image to run the container as described in the "How to Run" section.
+#### Firefox
+1. Откройте `about:config`
+2. Найдите `network.proxy.http` и установите значение вашего прокси сервера
+3. Установите `network.proxy.http_port` в `8080`
+4. Установите `network.proxy.ssl` и `network.proxy.ssl_port` аналогично
+5. Установите `network.proxy.type` в `1`
 
-## Further Links
-* [NGINX](https://www.nginx.com/)
-* [A forward proxy module for CONNECT request handling](https://github.com/chobits/ngx_http_proxy_connect_module)
-* [Build options to improve the performance and security of Nginx](https://www.unixteacher.org/blog/build-options-to-improve-the-performance-and-security-of-nginx/)
+#### Chrome/Chromium
+Расширение: [Proxy SwitchyOmega](https://chrome.google.com/webstore/detail/proxy-switchyomega/padekgcemlokbadohgkifijomclgjgif)
+
+### Настройка в мобильных устройствах
+
+#### Android
+1. Настройки → Сеть и интернет → Wi-Fi
+2. Выберите сеть → Изменить сеть → Расширенные настройки
+3. Тип прокси: Ручной
+4. Имя хоста прокси: ваш Railway домен
+5. Порт прокси: 8080
+
+#### iOS
+1. Настройки → Wi-Fi
+2. Выберите сеть → Настроить прокси
+3. Ручной → Сервер: ваш Railway домен, Порт: 8080
+
+### Примеры использования с curl
+
+```bash
+# HTTP запрос через прокси
+curl -x http://your-proxy.railway.app:8080 http://httpbin.org/get
+
+# HTTPS запрос через прокси
+curl -x http://your-proxy.railway.app:8080 -k https://httpbin.org/get
+
+# YouTube через прокси
+curl -x http://your-proxy.railway.app:8080 -k https://www.youtube.com/watch?v=dQw4w9WgXcQ
+```
+
+## 🔧 Конфигурация
+
+### Переменные окружения
+
+| Переменная | Значение по умолчанию | Описание |
+|------------|----------------------|----------|
+| `PORT` | `8080` | Порт для прослушивания |
+| `RATE_LIMIT` | `1000` | Максимум запросов в секунду |
+| `TIMEOUT` | `30s` | Таймаут соединения |
+| `ALLOWED_IPS` | `0.0.0.0/0` | Разрешенные IP адреса |
+
+### Мониторинг
+
+- **Health check**: `GET https://your-proxy.railway.app/health`
+- **Логи**: Доступны в Railway dashboard
+
+## 🔐 Безопасность
+
+Проект включает множество мер безопасности:
+
+- **Rate Limiting**: Ограничение количества запросов
+- **Connection Limits**: Ограничение количества соединений на IP
+- **Блокировка опасных путей**: Запрет доступа к localhost, внутренним сетям
+- **Безопасные заголовки**: HSTS, CSP, X-Frame-Options и др.
+- **Скрытие версии сервера**: Удаление информации о сервере из ответов
+
+## 🌐 Поддерживаемые протоколы
+
+- ✅ HTTP (порт 80)
+- ✅ HTTPS (порт 443 через CONNECT туннель)
+- ❌ SOCKS протоколы (требуют дополнительной настройки)
+
+## 🚨 Важные предупреждения
+
+⚠️ **Используйте только для легальных целей**
+⚠️ **Не используйте для нарушения законов вашей страны**
+⚠️ **Производительность зависит от вашего тарифного плана Railway**
+⚠️ **Бесплатный тариф Railway имеет ограничения по трафику**
+
+## 🛠 Технические детали
+
+| Компонент | Версия |
+|-----------|--------|
+| Базовый образ | dominikbechstein/nginx-forward-proxy:latest |
+| NGINX модуль | ngx_http_proxy_connect_module |
+| Платформа | Alpine Linux |
+
+## 📝 Лицензия
+
+Проект основан на [dominikbechstein/nginx-forward-proxy](https://github.com/dominikbechstein/nginx-forward-proxy) с улучшениями для production использования на Railway.
