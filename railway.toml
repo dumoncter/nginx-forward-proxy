@@ -7,11 +7,11 @@ restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
 
 [[services]]
-internalPort = 8080
+internalPort = 443
 processes = 1
 
 [services.env]
-PORT = "8080"
+PORT = "443"
 ALLOWED_IPS = "0.0.0.0/0"
 RATE_LIMIT = "1000"
 TIMEOUT = "30s"
